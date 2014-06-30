@@ -1,0 +1,2 @@
+DEV=/dev/ttyUSB0
+READER=R1

@@ -1,0 +1,21 @@
+#!/bin/bash -e
+REQUEST=etc/request
+if [[ "$(id -u)" != "0" ]]; then echo "error: must be run as root" >&2; exit 1; fi
+cd "$(dirname "$0")"/..
+CMD=$1; shift||true
+case "$CMD" in
+new)
+  if [[ $# != 1 ]]; then echo "usage: $0 $CMD <userid>" >&2; exit 3; fi
+  USERID=$1
+  if [[ -e "$REQUEST" ]]; then echo "there is a pending request for $(<"$REQUEST")"; exit 4; fi
+  echo "$USERID" >"$REQUEST"
+;;
+rm)
+  if [[ $# != 0 ]]; then echo "usage: $0 $CMD" >&2; exit 5; fi
+  if [[ ! -e "$REQUEST" ]]; then echo "there is no pending request"; exit 6; fi
+  rm "$REQUEST"
+;;
+*)
+  echo "usage: $0 new | rm" >&2; exit 2
+;;
+esac

@@ -1,0 +1,20 @@
+#!/bin/bash -e
+RUND=etc/run.d
+REQUEST=etc/request
+if [[ "$(id -u)" != "0" ]]; then echo "error: must be run as root" >&2; exit 1; fi
+cd "$(dirname "$0")"/..
+source etc/config
+"$(dirname "$0")"/keyfob scan | while read -r id; do
+  uid=${id#* }
+  if [[ "$uid" != '-' ]]; then
+    echo "identified user $uid; running scripts" >&2
+    run-parts --verbose --arg="$uid" -- "$RUND"
+  elif [[ -O "$REQUEST" ]]; then
+    echo "unidentified key; handling new user request" >&2
+    serial=${id% *}
+    "$(dirname "$0")"/keyfob add "$(<"$REQUEST")" "$serial"
+    rm "$REQUEST"
+  else
+    echo "unidentified key; ignoring" >&2
+  fi
+done

@@ -1,0 +1,9 @@
+[Unit]
+Description=Key Fob Daemon
+
+[Service]
+ExecStart=/PATH/TO/bin/keyfob-run
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
