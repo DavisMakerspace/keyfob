@@ -17,10 +17,10 @@ rm)
   rm "$REQUEST"
 ;;
 handle)
-  if [[ $# != 1 ]]; then echo "usage: $0 $CMD <serial>" >&2; exit 7; fi
-  SERIAL=$1
+  if [[ $# != 1 ]]; then echo "usage: $0 $CMD <hash>" >&2; exit 7; fi
+  HASH=$1
   if [[ ! -O "$REQUEST" ]]; then echo "there is no pending request"; exit 8; fi
-  bin/keyfob add "$(<"$REQUEST")" "$SERIAL"
+  bin/keyfob addhash "$(<"$REQUEST")" "$HASH"
   rm "$REQUEST"
 ;;
 *)

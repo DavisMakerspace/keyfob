@@ -15,7 +15,7 @@ keys(){
   cat "$KEYSFILE"
 }
 hash(){ echo "$1" | sha256sum | cut -d ' ' -f 1; }
-uidforkey(){ keys | grep " $(hash "$1")\$" 2>/dev/null | cut -d ' ' -f 1 || true; }
+uidforhash(){ keys | grep " $1\$" 2>/dev/null | cut -d ' ' -f 1 || true; }
 readfobs(){
   socat "$ADDR" STDOUT | while read -r line; do
     reader=$(echo "$line" | cut -d '*' -f 1)
@@ -35,21 +35,28 @@ user)
   USERID=$1
   if ! (keys | grep -E "^$USERID " 2>/dev/null) then echo "error: user $USERID not found" >&2; exit 4; fi
 ;;
-add)
-  if [[ $# != 2 ]]; then echo "usage: $0 $CMD <userid> <serial>" >&2; exit 5; fi
-  USERID=$1; SERIAL=$2
-  existing=$(uidforkey "$serial")
+addhash)
+  if [[ $# != 2 ]]; then echo "usage: $0 $CMD <userid> <hash>" >&2; exit 5; fi
+  USERID=$1; HASH=$2
+  existing=$(uidforhash "$HASH")
   if [[ -n "$existing" ]]; then echo "key already registered for $existing" >&2; exit 6; fi
-  echo "$USERID" "$(hash "$SERIAL")" >>$KEYSFILE
+  echo "$USERID" "$HASH" >>$KEYSFILE
   echo "registered key for $USERID"
 ;;
+add)
+  if [[ $# != 2 ]]; then echo "usage: $0 $CMD <userid> <serial>" >&2; exit 7; fi
+  USERID=$1; SERIAL=$2
+  hash=$(hash "$SERIAL")
+  "$0" addhash "$hash"
+;;
 scan)
-  if [[ $# != 0 ]]; then echo "usage: $0 $CMD" >&2; exit 7; fi
+  if [[ $# != 0 ]]; then echo "usage: $0 $CMD" >&2; exit 8; fi
   readfobs | while read -r serial; do
-    echo "$serial:$(uidforkey "$serial")"
+    hash=$(hash "$serial")
+    echo "$(uidforhash "$hash"):$hash"
   done
 ;;
 *)
-  echo "usage: $0 user | add | scan" >&2; exit 2
+  echo "usage: $0 user | addhash | add | scan" >&2; exit 2
 ;;
 esac
