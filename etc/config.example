@@ -1,2 +1,2 @@
-DEV=/dev/ttyUSB0
+ADDR=FILE:/dev/ttyUSB0,raw,b9600,echo=0,crnl
 READER=R1

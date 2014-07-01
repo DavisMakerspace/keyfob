@@ -1,7 +1,6 @@
 #!/bin/bash -e
 
 KEYSFILE=etc/keys
-DEVOPTS=raw,b9600,echo=0,crnl
 
 if [[ "$(id -u)" != "0" ]]; then echo "error: must be run as root" >&2; exit 1; fi
 
@@ -18,7 +17,7 @@ keys(){
 hash(){ echo "$1" | sha256sum | cut -d ' ' -f 1; }
 uidforkey(){ keys | grep " $(hash "$1")\$" 2>/dev/null | cut -d ' ' -f 1 || true; }
 readfobs(){
-  socat FILE:"$DEV","$DEVOPTS" STDOUT | while read -r line; do
+  socat "$ADDR" STDOUT | while read -r line; do
     reader=$(echo "$line" | cut -d '*' -f 1)
     serial=$(echo "$line" | cut -d '*' -f 2)
     if [[ "$reader" == "$READER" ]]; then
