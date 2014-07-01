@@ -47,8 +47,7 @@ add)
 scan)
   if [[ $# != 0 ]]; then echo "usage: $0 $CMD" >&2; exit 7; fi
   readfobs | while read -r serial; do
-    uid=$(uidforkey "$serial")
-    echo "$serial" "${uid:--}"
+    echo "$serial:$(uidforkey "$serial")"
   done
 ;;
 *)
