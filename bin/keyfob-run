@@ -5,14 +5,15 @@ cd "$(dirname "$0")"/..
 source etc/config
 bin/keyfob scan | while read -r id; do
   uid=${id%:*}
+  hash=${id##*:}
   if [[ -n "$uid" ]]; then
     echo "identified user $uid; running scripts" >&2
     run-parts --verbose --arg="$uid" -- "$RUND"
   elif (bin/request exists); then
     echo "unidentified key; handling new user request" >&2
-    hash=${id##*:}
     bin/request handle "$hash"
   else
     echo "unidentified key; ignoring" >&2
+    bin/nonkey addhash "$hash"
   fi
 done
