@@ -32,6 +32,6 @@ import)
   sed -i'' "/ $hash\$/d" "$NONKEYSFILE"
 ;;
 *)
-  echo "usage: $0 addhash | list" >&2; exit 2
+  echo "usage: $0 addhash | list | import" >&2; exit 2
 ;;
 esac
